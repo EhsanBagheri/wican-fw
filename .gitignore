@@ -1,5 +1,6 @@
-build/
-esp_idf_components/
+/Hardware/EmergencyDisplay/History
+/Firmware/Debug
+
 # Prerequisites
 *.d
 
@@ -8,6 +9,7 @@ esp_idf_components/
 *.ko
 *.obj
 *.elf
+*.pyc
 
 # Linker output
 *.ilk
@@ -52,3 +54,44 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# emacs
+.dir-locals.el
+
+# emacs temp file suffixes
+*~
+.#*
+\#*#
+
+# eclipse setting
+.settings
+
+# MacOS directory files
+.DS_Store
+
+# Application project files
+**/sdkconfig
+**/sdkconfig.old
+**/build
+**/*.bin
+dependencies.lock
+
+# IDF Components manage
+**/managed_components
+
+# node_modules
+docs/docusaurus/website/node_modules
+
+# cli logs
+**/logs
+
+#vscode
+.vscode
+
+# ZIP files
+*.ZIP
+*.zip
+
+# Altium files
+*.SchDocPreview
+*.LOG
