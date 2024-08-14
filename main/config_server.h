@@ -48,7 +48,7 @@
 #define SLCAN				0
 #define REALDASH			1
 #define SAVVYCAN			2
-#define OBD_ELM327			3					  
+#define OBD_ELM327			3
 
 typedef struct _device_config
 {
@@ -75,10 +75,21 @@ typedef struct _device_config
 	char batt_alert_port[32];
 	char batt_alert_topic[256];
 	char batt_alert_time[16];
+	char batt_mqtt_user[64];
+	char batt_mqtt_pass[64];
+	char mqtt_en[10];
+	char mqtt_url[256];
+	char mqtt_port[32];
+	char mqtt_user[64];
+	char mqtt_pass[64];
+	char mqtt_elm327_log[10];
+	char mqtt_tx_topic[64];
+	char mqtt_rx_topic[64];
+	char mqtt_status_topic[64];
 }device_config_t;
 
 
-void config_server_start(QueueHandle_t *xTXp_Queue, QueueHandle_t *xRXp_Queue, uint8_t connected_led);
+void config_server_start(QueueHandle_t *xTXp_Queue, QueueHandle_t *xRXp_Queue, uint8_t connected_led, char * did);
 void config_server_stop(void);
 int8_t config_server_get_wifi_mode(void);
 int8_t config_server_get_ap_ch(void);
@@ -112,3 +123,15 @@ char *config_server_get_alert_url(void);
 char *config_server_get_alert_topic(void);
 int8_t config_server_get_alert_volt(float *alert_volt);
 int config_server_get_alert_time(void);
+char *config_server_get_alert_mqtt_user(void);
+char *config_server_get_alert_mqtt_pass(void);
+int8_t config_server_mqtt_en_config(void);
+char *config_server_get_mqtt_url(void);
+int32_t config_server_get_mqtt_port(void);
+char *config_server_get_mqtt_user(void);
+char *config_server_get_mmqtt_pass(void);
+char *config_server_get_mqtt_canflt(void);
+int8_t config_server_mqtt_elm327_log(void);
+char *config_server_get_mqtt_tx_topic(void);
+char *config_server_get_mqtt_rx_topic(void);
+char *config_server_get_mqtt_status_topic(void);

@@ -26,6 +26,7 @@
 #include "esp_wifi.h"
 #include "esp_system.h"
 #include "esp_event.h"
+#include "esp_mac.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
@@ -54,7 +55,7 @@ static EventGroupHandle_t s_wifi_event_group = NULL;
 #define EXAMPLE_ESP_MAXIMUM_RETRY 	10
 char sta_ip[20] = {0};
 
-static const TickType_t connect_delay[] = {10000, 20000, 30000, 45000, 30000,20000};
+static const TickType_t connect_delay[] = {1000, 1000, 1000, 1000, 1000,1000};
 
 static void wifi_network_event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
@@ -181,6 +182,11 @@ static void wifi_conn_task(void *pvParameters)
 		ESP_LOGI(WIFI_TAG, "Trying to connect...");
 		xEventGroupClearBits(s_wifi_event_group, WIFI_CONNECT_IDLE_BIT);
 		esp_wifi_connect();
+		xEventGroupWaitBits(s_wifi_event_group,
+					WIFI_CONNECT_IDLE_BIT,
+		            pdFALSE,
+		            pdTRUE,
+		            portMAX_DELAY);
 		vTaskDelay(pdTICKS_TO_MS(connect_delay[s_retry_num++]));
 		s_retry_num %= (sizeof(connect_delay)/sizeof(TickType_t));
 	}
@@ -213,6 +219,15 @@ void wifi_network_init(char* sta_ssid, char* sta_pass)
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
+    if(config_server_get_ble_config())
+    {
+    	ESP_ERROR_CHECK( esp_wifi_set_ps(WIFI_PS_MIN_MODEM) );
+    }
+    else
+	{
+		ESP_ERROR_CHECK( esp_wifi_set_ps(WIFI_PS_NONE) );
+	}
+
     esp_event_handler_instance_t instance_any_id;
     esp_event_handler_instance_t instance_got_ip;
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
@@ -234,6 +249,11 @@ void wifi_network_init(char* sta_ssid, char* sta_pass)
              * However these modes are deprecated and not advisable to be used. Incase your Access point
              * doesn't support WPA2, these mode can be enabled by commenting below line */
 			.threshold.authmode = WIFI_AUTH_WPA2_PSK,
+			.rm_enabled = 1,
+			.btm_enabled = 1,
+			.scan_method = WIFI_ALL_CHANNEL_SCAN,
+			.sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
+			.bssid_set = false,
 
             .pmf_cfg = {
                 .capable = true,

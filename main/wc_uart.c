@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <inttypes.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include  "freertos/queue.h"
 #include "freertos/event_groups.h"
 #include "esp_system.h"
-#include "esp_log.h"
+//#include "esp_log.h"
 #include "driver/uart.h"
 #include "string.h"
 #include "driver/gpio.h"
@@ -41,7 +41,7 @@ static void uart_rx_task(void *arg)
 //    static xdev_buffer tx_buffer;
 	static xdev_buffer rx_buffer;
     uart_event_t event;
-    static uint8_t dtmp[128];
+    // static uint8_t dtmp[128];
     while (1)
     {
 //    	xQueueReceive(*xuart_tx_queue, ( void * ) &tx_buffer, portMAX_DELAY);
@@ -49,7 +49,7 @@ static void uart_rx_task(void *arg)
         if(xQueueReceive(uart0_queue, (void * )&event, (portTickType)portMAX_DELAY))
         {
             bzero(rx_buffer.ucElement, sizeof(rx_buffer.ucElement));
-//            ESP_LOGI(TAG, "uart[%d] event:", UART_NUM_0);
+//            //ESP_LOGI(TAG, "uart[%d] event:", UART_NUM_0);
             switch(event.type)
             {
                 //Event of UART receving data
@@ -57,9 +57,9 @@ static void uart_rx_task(void *arg)
                 other types of events. If we take too much time on data event, the queue might
                 be full.*/
                 case UART_DATA:
-//                    ESP_LOGI(TAG, "[UART DATA]: %d", event.size);
+//                    //ESP_LOGI(TAG, "[UART DATA]: %d", event.size);
 //                    uart_read_bytes(UART_NUM_0, dtmp, event.size, portMAX_DELAY);
-//                    ESP_LOGI(TAG, "[DATA EVT]:");
+//                    //ESP_LOGI(TAG, "[DATA EVT]:");
 //                    uart_write_bytes(UART_NUM_0, (const char*) dtmp, event.size);
 						rx_buffer.usLen = uart_read_bytes(UART_NUM_0, rx_buffer.ucElement, RX_BUF_SIZE, 1 / portTICK_PERIOD_MS);
 						rx_buffer.dev_channel = DEV_UART;
@@ -72,7 +72,7 @@ static void uart_rx_task(void *arg)
 
                 //Others
                 default:
-//                    ESP_LOGI(__func__, "uart event type: %d", event.type);
+//                    //ESP_LOGI(__func__, "uart event type: %d", event.type);
 //                		sprintf((char*)dtmp,"uart event type: %d", event.type);
 //                		uart_write_bytes(UART_NUM_0, (const char*) dtmp, strlen((char*)dtmp));
                     break;
@@ -118,9 +118,8 @@ void wc_uart_init(QueueHandle_t *xTXp_Queue, QueueHandle_t *xRXp_Queue, uint8_t 
 //    esp_err_t uart_set_pin(uart_port_t uart_num, int tx_io_num, int rx_io_num, int rts_io_num, int cts_io_num);
 //    uart_set_pin(UART_NUM_0, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, 2, 10);
     uart_set_pin(UART_NUM_0, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    xTaskCreate(uart_tx_task, "uart_tx_task", 1024*2, NULL, (void*)AF_INET, NULL);
-    xTaskCreate(uart_rx_task, "uart_rx_task", 1024*2, NULL, (void*)AF_INET, NULL);
-
+    xTaskCreate(uart_tx_task, "uart_tx_task", 1024*2, (void*)AF_INET, 5, NULL);
+    xTaskCreate(uart_rx_task, "uart_rx_task", 1024*2, (void*)AF_INET, 5, NULL);
 }
 
 

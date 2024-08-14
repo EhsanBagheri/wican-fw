@@ -18,13 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MQTT_h
+#define MQTT_h
 
-#ifndef __ELM327__
-#define __ELM327__
+#include "driver/twai.h"
+#include "elm327.h"
 
-#define ELM327_CAN_RX   0x01
-#define ELM327_CAN_TX   0x02
+#define MQTT_CAN        0x00
+#define MQTT_RX         ELM327_CAN_RX
+#define MQTT_TX         ELM327_CAN_TX
 
-void elm327_init(void (*send_to_host)(char*, uint32_t, QueueHandle_t *q), QueueHandle_t *rx_queue, void (*can_log)(twai_message_t* frame, uint8_t type));
-int8_t elm327_process_cmd(uint8_t *buf, uint8_t len, twai_message_t *frame, QueueHandle_t *q);
+typedef struct
+{
+    uint8_t type;
+    twai_message_t frame;
+}mqtt_can_message_t;
+
+void mqtt_init(char* id, uint8_t connected_led, QueueHandle_t *xtx_queue);
+int mqtt_connected(void);
 #endif
